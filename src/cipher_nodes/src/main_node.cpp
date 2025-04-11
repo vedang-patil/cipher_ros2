@@ -2,6 +2,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "cipher_interfaces/msg/cipher_message.hpp"
 #include "cipher_interfaces/srv/cipher_answer.hpp"
+#include "std_msgs/msg/string.hpp"
+#include <memory>
 
 using std::placeholders::_1;
 
@@ -34,6 +36,7 @@ public:
     {
         subscription_ = this->create_subscription<cipher_interfaces::msg::CipherMessage>("message_to_encode", 10,
             std::bind(&MainNode::callback, this, _1));
+        client_ = this->create_client<cipher_interfaces::srv::CipherAnswer>("verify_message");
     }
 private:
     void callback(const cipher_interfaces::msg::CipherMessage::SharedPtr msg) {
