@@ -14,9 +14,7 @@ std::string encode(const std::string& input, int8_t key)
     for (char &c: result) {
         if (isalpha(c)) {
             char offset = islower(c) ? 'a' : 'A';
-            c = (c - offset + key + 26) % 26 + offset;
-        } else {
-            result += c;
+            c = (c - offset + key) % 26 + offset;
         }
     }
 
