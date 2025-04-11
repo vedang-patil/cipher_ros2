@@ -57,6 +57,8 @@ private:
                 RCLCPP_INFO(this->get_logger(), "Decoded message doesn't match original.");
             }
         }
+
+        rclcpp::shutdown();
     }
 };
 
