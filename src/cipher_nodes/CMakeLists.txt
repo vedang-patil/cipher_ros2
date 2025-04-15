@@ -17,13 +17,9 @@ ament_target_dependencies(game_setter rclcpp std_msgs cipher_interfaces)
 add_executable(main_node src/main_node.cpp)
 ament_target_dependencies(main_node rclcpp std_msgs cipher_interfaces)
 
-add_executable(game_verifier src/game_verifier.cpp)
-ament_target_dependencies(game_verifier rclcpp std_msgs cipher_interfaces)
-
 install(TARGETS
   game_setter
   main_node
-  game_verifier
   DESTINATION lib/${PROJECT_NAME})
 
 ament_package()

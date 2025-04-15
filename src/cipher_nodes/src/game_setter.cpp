@@ -5,6 +5,8 @@
 #include "std_msgs/msg/string.hpp"
 #include <memory>
 
+using std::placeholders::_1;
+using std::placeholders::_2;
 
 std::string encode(const std::string& input, int8_t key)
 {
@@ -25,30 +27,34 @@ class GameSetter : public rclcpp::Node
 {
 private:
     rclcpp::Publisher<cipher_interfaces::msg::CipherMessage>::SharedPtr publisher_;
-    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher2_;
+    rclcpp::Service<cipher_interfaces::srv::CipherAnswer>::SharedPtr service_;
+
+    std::string _original;
+    int8_t _key;
 public:
     GameSetter()
         :Node("game_setter")
     {
         publisher_ = this->create_publisher<cipher_interfaces::msg::CipherMessage>("message_to_encode", 10);
-        publisher2_ = this->create_publisher<std_msgs::msg::String>("original_message", 10);
-
-        std::string messageToEncrypt;
-        int8_t key;
+        service_ = this->create_service<cipher_interfaces::srv::CipherAnswer>("verify_message",
+            std::bind(&GameSetter::callbackService, this, _1, _2));
 
         std::cout << "Message to Encode: ";
-        getline(std::cin, messageToEncrypt);
+        getline(std::cin, _original);
         std::cout << "Key: ";
-        std::cin >> key;
+        std::cin >> _key;
 
         auto message = cipher_interfaces::msg::CipherMessage();
-        message.message = encode(messageToEncrypt, key);
-        message.key = key;
+        message.message = encode(_original, _key);
+        message.key = _key;
 
         publisher_->publish(message);
-        auto original = std_msgs::msg::String();
-        original.data = messageToEncrypt;
-        publisher2_->publish(original);
+    }
+
+    void callbackService(const cipher_interfaces::srv::CipherAnswer::Request::SharedPtr request,
+        const cipher_interfaces::srv::CipherAnswer::Response::SharedPtr response)
+    {
+        response->result = (request->answer == _original);
     }
 };
 
